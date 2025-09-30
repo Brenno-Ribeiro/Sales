@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="SalesSoftware.App/SalesSoftware.App.csproj" />
+  <Project Path="SalesSoftware.Bll/SalesSoftware.Bll.csproj" />
+  <Project Path="SalesSoftware.Dal/SalesSoftware.Dal.csproj" />
+</Solution>

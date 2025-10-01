@@ -7,6 +7,12 @@ GO
 USE salesdb;
 GO
 
+IF OBJECT_ID('order_items', 'U') IS NOT NULL DROP TABLE order_items;
+IF OBJECT_ID('orders', 'U') IS NOT NULL DROP TABLE orders;
+IF OBJECT_ID('customers', 'U') IS NOT NULL DROP TABLE customers;
+IF OBJECT_ID('products', 'U') IS NOT NULL DROP TABLE products;
+GO
+
 
 CREATE TABLE customers (
     id INT IDENTITY(1,1) PRIMARY KEY,
@@ -69,4 +75,68 @@ INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES
 (3, 3, 1, 150.00),
 (4, 4, 2, 1200.00),
 (5, 5, 1, 900.00);
+GO
+
+
+
+IF OBJECT_ID('sp_report_orders_per_customer', 'P') IS NOT NULL
+DROP PROCEDURE sp_report_orders_per_customer;
+CREATE PROCEDURE sp_report_orders_per_customer
+    @customer_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        c.name AS customer,
+        o.order_date AS order_date,
+        p.name AS protuct,
+        oi.quantity AS quantity,
+        (oi.quantity * oi.unit_price) AS total_item
+    FROM customers c
+    JOIN orders o       ON o.customer_id = c.id
+    JOIN order_items oi ON oi.order_id = o.id
+    JOIN products p     ON p.id = oi.product_id
+    WHERE c.id = @customer_id
+    ORDER BY o.order_date, p.name;
+END;
+GO
+
+
+IF OBJECT_ID('sp_top_selling_products', 'P') IS NOT NULL
+DROP PROCEDURE sp_top_selling_products;
+CREATE PROCEDURE sp_top_selling_products
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        p.id AS id,
+        p.name AS product,
+        SUM(oi.quantity) AS total_sold
+    FROM order_items oi
+    JOIN products p ON p.id = oi.product_id
+    GROUP BY p.id, p.name
+    ORDER BY total_sold DESC;
+END;
+GO
+
+
+IF OBJECT_ID('sp_high_value_customers', 'P') IS NOT NULL
+DROP PROCEDURE sp_high_value_customers;
+CREATE OR ALTER PROCEDURE sp_high_value_customers
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT 
+        c.id AS id,
+        c.name AS customer,
+        SUM(oi.quantity * oi.unit_price) AS total_spent
+    FROM customers c
+    JOIN orders o       ON o.customer_id = c.id
+    JOIN order_items oi ON oi.order_id = o.id
+    GROUP BY c.id, c.name
+    HAVING SUM(oi.quantity * oi.unit_price) > 1000
+    ORDER BY total_spent DESC;
+END;
 GO

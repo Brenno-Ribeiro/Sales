@@ -18,7 +18,7 @@ IServiceCollection autoMapperServices = builder.Services.AddAutoMapper(typeof(Au
 builder.Services.AddControllersWithViews();
 
 
-builder.Services.AddSingleton<IBaseConnection>(sp =>
+builder.Services.AddTransient<IBaseConnection>(sp =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     return new BaseConnection(connectionString);

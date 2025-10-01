@@ -23,10 +23,32 @@
             <tr>
                 <td>
                     <i class="bi bi-box mx-2"></i>
-                    Pedidos
+                    Pedidos por cliente
                  </td>
                 <td>
                     <a asp-controller="Report" asp-action="Orders" class="btn btn-sm btn-secondary">
+                        Ir para emissão
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <i class="bi bi-currency-dollar"></i>
+                    Produtos mais vendidos
+                </td>
+                <td>
+                    <a asp-controller="Report" asp-action="Product" class="btn btn-sm btn-secondary">
+                       Emitir
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <i class="bi bi-people"></i>
+                    Cliente que compram acima de 1000 R$
+                </td>
+                <td>
+                    <a asp-controller="Report" asp-action="Customer" class="btn btn-sm btn-secondary">
                         Emitir
                     </a>
                 </td>

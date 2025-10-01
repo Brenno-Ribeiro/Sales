@@ -1,4 +1,6 @@
-﻿<div>
+﻿@model SalesSoftware.App.Models.ViewModel.OrderReportViewModel
+
+<div>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
@@ -11,4 +13,35 @@
 
     <h1 class="display-5 text-center text-md-start">Relatório de Pedidos</h1>
     <p class="card-text text-muted text-center text-md-start">Gere seu relatório de pedidos.</p>
+
+
+    <form asp-action="Orders" method="post" class="row g-3mt-5" >
+        <div class="col-md-4">
+            <label class="form-label">Cliente</label>
+            <select asp-for="customer_id" class="form-select">
+                <option value="">Todos os clientes</option>
+                @foreach (var c in Model.customers)
+                {
+                    <option value="@c.id" selected="@(Model.customer_id == c.id)">
+                        @c.name
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Data Inicial</label>
+            <input asp-for="start_date" type="date" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Data Final</label>
+            <input asp-for="end_date" type="date" class="form-control" />
+        </div>
+
+        <div class="col-md-2 align-self-end">
+            <button type="submit" class="btn btn-primary w-100">Gerar</button>
+        </div>
+    </form>
+
 </div>

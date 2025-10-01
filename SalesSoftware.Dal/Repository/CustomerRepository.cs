@@ -13,6 +13,17 @@ public  class CustomerRepository : ICustomerRepository
         _baseConnection = baseConnection;
     }
 
+    public IEnumerable<Customer> GetAllCustomers()
+    {
+        using (var conn = _baseConnection.CreateConnection())
+        {
+            return conn.Query<Customer>(
+                "sp_get_all_customers",
+                commandType: CommandType.StoredProcedure
+            );
+        }
+    }
+
     public IEnumerable<CustomerReport> GetCustomertHighValue()
     {
         using (var conn = _baseConnection.CreateConnection())

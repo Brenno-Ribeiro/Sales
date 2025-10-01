@@ -17,6 +17,12 @@ public class CustomerService : ICustomerService
         _mapper = mapper;
     }
 
+    public IEnumerable<Customer> GetAllCustomers()
+    {
+        var customers = _customerRepository.GetAllCustomers();
+        return _mapper.Map<IEnumerable<Customer>>(customers);
+    }
+
     public IEnumerable<CustomerReport> GetCustomertHighValue()
     {
         var customerReports = _customerRepository.GetCustomertHighValue();

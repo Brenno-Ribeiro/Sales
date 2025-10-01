@@ -140,3 +140,20 @@ BEGIN
     ORDER BY total_spent DESC;
 END;
 GO
+
+IF OBJECT_ID('sp_get_all_customers', 'P') IS NOT NULL
+DROP PROCEDURE sp_get_all_customers;
+CREATE PROCEDURE sp_get_all_customers
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        id,
+        name,
+        cpf,
+        registration_date
+    FROM customers
+    ORDER BY name;
+END;
+GO

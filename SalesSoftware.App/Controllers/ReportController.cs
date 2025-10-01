@@ -55,17 +55,23 @@ namespace SalesSoftware.App.Controllers
         {
             ViewData["Title"] = "Relatório de Pedidos";
 
-            var customers = _customerService.GetAllCustomers();
+            var customer = _customerService.GetOrderReposrtByCustomer(filter.customer_id ?? 0);
 
-            filter.customers = customers.Select(c => new CustomerViewModel
+            string reportPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports", "OrderDetails.rdlc");
+            LocalReport report = new LocalReport();
+
+            using (var fs = new FileStream(reportPath, FileMode.Open, FileAccess.Read))
             {
-                id = c.id,
-                name = c.name,
-                cpf = c.cpf,
-                registration_date = c.registration_date
-            }).ToList();
+                report.LoadReportDefinition(fs);
+            }
 
-            return View(filter);
+            report.DataSources.Add(new ReportDataSource("DataSet1", customer));
+
+            var pdf = report.Render("PDF");
+
+            RedirectToAction("Orders");
+
+            return File(pdf, "application/pdf", "PedidoPorCliente.pdf");
         }
 
 

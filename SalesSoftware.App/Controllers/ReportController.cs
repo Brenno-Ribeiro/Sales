@@ -78,7 +78,7 @@ namespace SalesSoftware.App.Controllers
 
            var productList = _productService.GetProductTopSelling();
 
-            string reportPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports", "TopSellingProducts.rdlc");
+            string reportPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports", "PedidosMaisVendidos.rdlc");
             LocalReport report = new LocalReport();
 
             using (var fs = new FileStream(reportPath, FileMode.Open, FileAccess.Read))
@@ -91,7 +91,7 @@ namespace SalesSoftware.App.Controllers
             // Renderiza PDF (ou "PDF" / "Excel" / "WORDOPENXML")
             var pdf = report.Render("PDF");
 
-            return File(pdf, "application/pdf", "TopSellingProducts.pdf");
+            return File(pdf, "application/pdf", "PedidosMaisVendidos.pdf");
 
         }
 
@@ -100,7 +100,23 @@ namespace SalesSoftware.App.Controllers
         public IActionResult Customer()
         {
             ViewData["Title"] = "Relatório de Clientes";
-            return View();
+
+            var customer = _customerService.GetCustomertHighValue();
+
+            string reportPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports", "ClienteAcima1000.rdlc");
+            LocalReport report = new LocalReport();
+
+            using (var fs = new FileStream(reportPath, FileMode.Open, FileAccess.Read))
+            {
+                report.LoadReportDefinition(fs);
+            }
+
+            report.DataSources.Add(new ReportDataSource("DataSet1", customer));
+
+            // Renderiza PDF (ou "PDF" / "Excel" / "WORDOPENXML")
+            var pdf = report.Render("PDF");
+
+            return File(pdf, "application/pdf", "ClienteAcima1000.pdf");
         }
 
     }

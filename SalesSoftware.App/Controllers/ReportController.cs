@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Reporting.NETCore;
 using SalesSoftware.App.Models.ViewModel;
 using SalesSoftware.Bll.Intefaces;
 
@@ -9,11 +10,13 @@ namespace SalesSoftware.App.Controllers
     {
         private readonly ILogger<ReportController> _logger;
         private readonly ICustomerService _customerService;
+        private readonly IProductService _productService;
 
-        public ReportController(ILogger<ReportController> logger, ICustomerService customerService)
+        public ReportController(ILogger<ReportController> logger, ICustomerService customerService, IProductService productService)
         {
             _logger = logger;
             _customerService = customerService;
+            _productService = productService;
         }
 
         [HttpGet]
@@ -71,7 +74,24 @@ namespace SalesSoftware.App.Controllers
         public IActionResult Product()
         {
             ViewData["Title"] = "Relatório de Produtos";
-            return View();
+
+
+           var productList = _productService.GetProductTopSelling();
+
+            string reportPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports", "TopSellingProducts.rdlc");
+            LocalReport report = new LocalReport();
+
+            using (var fs = new FileStream(reportPath, FileMode.Open, FileAccess.Read))
+            {
+                report.LoadReportDefinition(fs);
+            }
+
+            report.DataSources.Add(new ReportDataSource("DataSet1", productList));
+
+            // Renderiza PDF (ou "PDF" / "Excel" / "WORDOPENXML")
+            var pdf = report.Render("PDF");
+
+            return File(pdf, "application/pdf", "TopSellingProducts.pdf");
 
         }
 

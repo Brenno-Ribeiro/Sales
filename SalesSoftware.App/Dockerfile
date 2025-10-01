@@ -1,30 +1,41 @@
-f# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
+# Etapa base - runtime
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
 
+# Instalar dependências necessárias para System.Drawing (GDI+)
+RUN apt-get update \
+    && apt-get install -y libgdiplus libc6-dev \
+    && ln -s /usr/lib/libgdiplus.so /usr/lib/libgdiplus.dll \
+    && apt-get clean
 
-# This stage is used to build the service project
+EXPOSE 80
+
+# Etapa build - SDK
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["SalesSoftware.App/SalesSoftware.App.csproj", "SalesSoftware.App/"]
-RUN dotnet restore "./SalesSoftware.App/SalesSoftware.App.csproj"
+
+# Copia toda a solução
 COPY . .
+
+# Restaura pacotes
+RUN dotnet restore "SalesSoftware.App/SalesSoftware.App.csproj"
+
+# Build e publish
 WORKDIR "/src/SalesSoftware.App"
-RUN dotnet build "./SalesSoftware.App.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "SalesSoftware.App.csproj" -c Release -o /app/build
+RUN dotnet publish "SalesSoftware.App.csproj" -c Release -o /app/publish
 
-# This stage is used to publish the service project to be copied to the final stage
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./SalesSoftware.App.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
+# Etapa final
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+# Copiar os arquivos publicados
+COPY --from=build /app/publish .
+
+# Copiar a pasta de relatórios
+COPY SalesSoftware.App/Reports /app/Reports
+
+# Definir variável de ambiente para System.Drawing
+ENV DOTNET_SYSTEM_DRAWING_ENABLE_UNSAFE_FORMS_LIBS=true
+
 ENTRYPOINT ["dotnet", "SalesSoftware.App.dll"]

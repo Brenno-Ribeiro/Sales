@@ -16,4 +16,9 @@
     <Folder Include="wwwroot\img\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SalesSoftware.Bll\SalesSoftware.Bll.csproj" />
+    <ProjectReference Include="..\SalesSoftware.Dal\SalesSoftware.Dal.csproj" />
+  </ItemGroup>
+
 </Project>

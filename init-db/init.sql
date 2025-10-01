@@ -90,7 +90,7 @@ BEGIN
     SELECT 
         c.name AS customer,
         o.order_date AS order_date,
-        p.name AS protuct,
+        p.name AS product,
         oi.quantity AS quantity,
         (oi.quantity * oi.unit_price) AS total_item
     FROM customers c
